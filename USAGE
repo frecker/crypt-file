@@ -1,0 +1,11 @@
+1. crypt-file e <input_file> <output_file>
+
+Enter a password. Afterwards the input_file is read, encrypted and
+hashed with a hmac. The result is written to output_file.
+
+2. crypt-file d <input_file> <output_file>
+
+Enter a password. First, it is tested, whether the hmac is correct. If
+this is the case, then the file is decrypted and the result is written
+to output_file.
+

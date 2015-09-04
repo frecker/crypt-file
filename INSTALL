@@ -1,0 +1,15 @@
+1. You need the Haskell-Compiler ghc. If possible, you should install
+it via your package-manager. If this is not possible (probable you are
+using an operating-system without a package-manager), then you might
+want to install the Haskell Platform, available at
+https://www.haskell.org/downloads.
+
+2. Try "make". If you happen to be missing some libraries, then these
+commands should install the needed libraries:
+
+$ cabal update
+$ cabal install pbkdf
+$ cabal install cipher-aes
+$ cabal install hmac
+
+3. Now "make" should compile the program.
