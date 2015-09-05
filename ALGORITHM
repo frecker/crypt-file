@@ -1,0 +1,66 @@
+Encryption:
+
+1. The user inputs a PASSWORD.
+
+2. A random SALT with (32 Byte = 256 Bit) and a random IV with (16
+Byte = 128 Bit) are generated. Security Note: We assume, that a
+classical random-number-generator is sufficient. The SALT and the IV
+should be nonces.
+
+3. We use PBKDF2 with sha512, the PASSWORD, the SALT and 262144
+Iterations to create a 64 Byte (512 Bit) KEY.
+
+4. The KEY is split into two 32 Byte (256 Bit) keys, i.e. KEY =
+(KEY_1 || KEY_2).
+
+5. The PLAINTEXT is read from the filesystem.
+
+6. The PLAINTEXT is padded with a 1-Byte and 0 to 15 0-Bytes, so that
+the length of the PADDED-PlAINTEXT is divisible by 16, which is the
+blocksize of AES.
+
+7. The PADDED-PlAINTEXT is encrypted with AES in CBC-Mode, the key
+KEY_1 and the IV. The result is the CIPHERTEXT.
+
+8. A HMAC of (SALT || IV || CIPHERTEXT) is calculated with KEY_2 and
+the function hmac_sha1. The length of the HMAC is 20 Bytes.
+
+9. The result (SALT || IV || CIPHERTEXT || HMAC) is written as the
+output.
+
+Decryption:
+
+1. The user inputs a PASSWORD.
+
+2. The INPUT is tested, whether it is long enough to be split into
+INPUT = (SALT || IV || CIPHERTEXT || HMAC), where the SALT has length 32,
+the IV has length 16 and the HMAC has length 20. If this is not the
+case, then the program aborts. If the input is long enough, then it
+is spitted in this way.
+
+3. The KEY, KEY_1 and KEY_2 are calculated as in steps 3 and 4 from
+encryption.
+
+4. The HMAC_ACTUAL is calculated as in step 8 of the encryption. If
+HMAC_ACTUAL is different from HMAC, then the program aborts.
+
+5. The CIPHERTEXT is decrypted with AES-CBC, KEY_1 and IV. If the last
+block of CIPHERTEXT has not a length of 16 Bytes, then the program
+aborts. Otherwise, the result is the PADDED-PlAINTEXT.
+
+6. All 0-Bytes from the end of PADDED-PlAINTEXT are removed. Then it
+is checked, whether the last Byte of the rest is a 1-Byte. If not, then
+the program aborts. Otherwise, the 1-Byte is removed and the result
+is the PLAINTEXT.
+
+7. The PLAINTEXT is written to the filesystem.
+
+A final remark:
+Since Haskell relies on lazy evaluation, actually the above steps are
+not ordered in the way, the were, in other languages. For example in
+step 9 of the encryption process, the values of SALT, IV and
+CIPHERTEXT are available before the HMAC-calculation has even
+started. There are written to disk first. Then the program starts
+calculating the HMAC and finally the resulting 20 Bytes are written to
+disk. This reordering does however not alter the result of the process
+(otherwise it would be a bug in the Haskell-Compiler).
