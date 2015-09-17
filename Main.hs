@@ -19,6 +19,7 @@ main = do
   getArgs >>= \args -> case args of
     ["e",inp,out] -> encrypt_file count inp out
     ["d",inp,out] -> decrypt_file count inp out
+    _ -> putStrLn "usage: crypt-file {e|d} <input-file> <output-file>"
   where
     count = 64 * 4096
 
