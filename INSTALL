@@ -10,6 +10,6 @@ commands should install the needed libraries:
 $ cabal update
 $ cabal install pbkdf
 $ cabal install cipher-aes
-$ cabal install hmac
+$ cabal install crypto
 
 3. Now "make" should compile the program.
